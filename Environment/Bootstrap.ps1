@@ -11,8 +11,9 @@ function Write-log () {
       )
     Set-Location C:\Temp
     
-    $MyLogName = "$($MyInvocation.MyCommand.Name)"
-    $scriptLog = "$MyLogName.log"
+    $MyLogName = "$($MyInvocation.ScriptName)"
+    $LogName = (($MyLogName).Split('\')[$(($MyLogName).Split('\')).Count - 1]).Replace('.ps1','')
+    $scriptLog = "$LogName.log"
     if (!(Test-Path 'C:\Temp')) {
         New-Item -ItemType Directory -Name .\Temp
     }
