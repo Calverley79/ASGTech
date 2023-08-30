@@ -3,24 +3,19 @@
 .SYNOPSIS
     Download and execute a repo script
 .DESCRIPTION
- 
-.PARAMETER SiteKey
+    Downloads and executes a repo script
 
-.PARAMETER WhiteLabel
-
-.INPUTS
-
-.OUTPUTS
+.PARAMETER FileName
+    The name of the file without the .ps1
 
 .NOTES
-    Version:        
-    Author:         
-    Creation Date:  
-    Purpose/Change: 
+    Version:    1.0     
+    Author:     Chris Calverley   
+    Creation Date:  08/30/2023
+    Purpose/Change: Create
  
 .EXAMPLE
-
-.EXAMPLE
+    Execute-RepoScript.ps1 -FileName 'something'
 
 #>
 
