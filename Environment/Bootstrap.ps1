@@ -12,7 +12,7 @@ function Write-log () {
     Set-Location C:\
     
     $MyLogName = "$($MyInvocation.MyCommand.Name)"
-    $scriptLog = "C:\Temp\$MyLogName.log"
+    $scriptLog = ".\Temp\$MyLogName.log"
     if (!(Test-Path 'C:\Temp')) {
         New-Item -ItemType Directory -Name .\Temp
     }
