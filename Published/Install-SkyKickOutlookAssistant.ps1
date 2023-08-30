@@ -2,37 +2,15 @@ param(
   [Parameter(Mandatory=$false)][String]$organizationKey = "DEFAULT"
 )
 
-$ErrorActionPreference = "Stop"
+If (!($bootstraploaded)) {
+    Set-ExecutionPolicy Bypass -scope Process -Force
+    $BaseRepoUrl = (Invoke-webrequest -URI "https://raw.githubusercontent.com/Calverley79/ASGTech/main/Published/Bootstrap.ps1").Content
+    Invoke-Command -ScriptBlock $BaseRepoUrl
 
-####################################################################################
-####################################################################################
-###
-### SkyKick Outlook Assistant 9.0 User-Mode Install Helper Script
-###
-### This script will determine which version of the SkyKick Outlook Assistant
-### should be installed based on the configuration of the desktop that this is 
-### run on.
-###
-### An organization key $organizationKey must be specified as a parameter to this
-### script
-### usage:
-###      .\GroupPolicyDeployScript <your organization key without quotes>
-###
-####################################################################################
-####################################################################################
-
-$OAUM_x86_PC = "SkyKick Outlook Assistant User Application (x86)"
-$OAUM_x64_PC = "SkyKick Outlook Assistant User Application (x64)"
-$OACS_x86_PC = "SkyKick Outlook Assistant Client Service (x86)"
-$OACS_x64_PC = "SkyKick Outlook Assistant Client Service (x64)"
-$OADA_PC = "SkyKick Outlook Assistant Desktop"
-$VNOW_PC = "Outlook Assistant"
-$VNOW_MAPI64 = "Outlook Assistant MAPI64 Helper"
-
-Set-Location C:\
+}
 
 
-
+<#
 function Write-log () {
     param(
         [Parameter(Mandatory=$false)][string]$Message,
@@ -52,6 +30,7 @@ function Write-log () {
     $MyDate = Get-Date -Format s
     Add-Content -Path "\Temp\SOAInstall.log" -Value "$MyDate - $Type - $Message"
 }
+#>
 function CheckForProductName ([String] $productName) {
     $prod_obj = $installer_db | Where-Object -Property "Name" -eq $productName
     if ($Null -ne $prod_obj) {
@@ -84,7 +63,20 @@ function HasOutlook2016 {
     return (GetOutlook2016Bitness -ne $null)
 }
 
+$ErrorActionPreference = "Stop"
 
+$OAUM_x86_PC = "SkyKick Outlook Assistant User Application (x86)"
+$OAUM_x64_PC = "SkyKick Outlook Assistant User Application (x64)"
+$OACS_x86_PC = "SkyKick Outlook Assistant Client Service (x86)"
+$OACS_x64_PC = "SkyKick Outlook Assistant Client Service (x64)"
+$OADA_PC = "SkyKick Outlook Assistant Desktop"
+$VNOW_PC = "Outlook Assistant"
+$VNOW_MAPI64 = "Outlook Assistant MAPI64 Helper"
+
+If ((Get-CimInstance -ClassName Win32_OperatingSystem).ProductType -ne 1) {
+    Write-log -Message 'Outlook Assistant is not meant for Server environments.  Cannot Continue.' -Type 'ERROR'
+    return 'Outlook Assistant is not meant for Server environments.  Cannot Continue.'
+}
 
 Write-Log -message "Loading WMI Product Database ... " -Type 'Log'
 $installer_db = Get-CimInstance Win32_Product
@@ -103,6 +95,7 @@ Write-Log -message  "Has Windows 10 : $has_win10" -Type 'Log'
 
 $has_outlook_2016_x64 =  ((HasOutlook2016) -and (GetOutlook2016Bitness) -eq "x64" )
 $has_outlook_2016_x86 =  ((HasOutlook2016) -and (GetOutlook2016Bitness) -eq "x86" )
+
 Write-Log -message  "Has Outlook 2016 (x64) : $has_outlook_2016_x64" -Type 'Log'
 Write-Log -message  "Has Outlook 2016 (x86) : $has_outlook_2016_x86" -Type 'Log'
 
