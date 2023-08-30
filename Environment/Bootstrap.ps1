@@ -8,6 +8,7 @@ function Write-log {
         [Parameter(Mandatory=$false)][string]$Message,
         [Parameter(Mandatory=$False)][ValidateSet('Log','ERROR','Data')][String]$Type = 'Log'
       )
+      Set-ExecutionPolicy Bypass -scope Process -Force
       Set-Location C:\Temp
       $MyLogName = "$($MyInvocation.ScriptName)"
       $LogName = (($MyLogName).Split('\')[$(($MyLogName).Split('\')).Count - 1]).Replace('.ps1','')
