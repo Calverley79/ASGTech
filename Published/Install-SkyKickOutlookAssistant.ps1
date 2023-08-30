@@ -10,28 +10,6 @@ If (!($bootstraploaded)) {
 
 }
 
-
-<#
-function Write-log () {
-    param(
-        [Parameter(Mandatory=$false)][string]$Message,
-        [Parameter(Mandatory=$False)][ValidateSet('Log','ERROR','Data')][String]$Type = 'Log'
-      )
-      
-
-    if (!(Test-Path 'C:\Temp')) {
-        New-Item -ItemType Directory -Name .\Temp
-    }
-    if (!(Test-Path 'C:\Temp\SOAInstall.log')) {
-        New-Item -ItemType File -Name '\Temp\SOAInstall.log'
-        $MyDate = Get-Date -Format s
-        Add-Content -Path "\Temp\SOAInstall.log" -Value "$MyDate - $Type - SkyKick Outlook Assistant"
-        Add-Content -Path "\Temp\SOAInstall.log" -Value "$MyDate - $Type - $Message"
-    }
-    $MyDate = Get-Date -Format s
-    Add-Content -Path "\Temp\SOAInstall.log" -Value "$MyDate - $Type - $Message"
-}
-#>
 function CheckForProductName ([String] $productName) {
     $prod_obj = $installer_db | Where-Object -Property "Name" -eq $productName
     if ($Null -ne $prod_obj) {
