@@ -9,10 +9,10 @@ function Write-log () {
         [Parameter(Mandatory=$false)][string]$Message,
         [Parameter(Mandatory=$False)][ValidateSet('Log','ERROR','Data')][String]$Type = 'Log'
       )
-    Set-Location C:\
+    Set-Location C:\Temp
     
     $MyLogName = "$($MyInvocation.MyCommand.Name)"
-    $scriptLog = ".\Temp\$MyLogName.log"
+    $scriptLog = "$MyLogName.log"
     if (!(Test-Path 'C:\Temp')) {
         New-Item -ItemType Directory -Name .\Temp
     }
