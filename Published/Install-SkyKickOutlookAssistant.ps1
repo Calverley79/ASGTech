@@ -2,13 +2,6 @@ param(
   [Parameter(Mandatory=$false)][String]$organizationKey = "DEFAULT"
 )
 
-If (!($bootstraploaded)) {
-    Set-ExecutionPolicy Bypass -scope Process -Force
-    $BaseRepoUrl = (Invoke-webrequest -URI "https://raw.githubusercontent.com/Calverley79/ASGTech/main/Environment/Bootstrap.ps1").Content
-    $scriptblock = [scriptblock]::Create($BaseRepoUrl)
-    Invoke-Command -ScriptBlock $scriptblock
-
-}
 
 function CheckForProductName ([String] $productName) {
     $prod_obj = $installer_db | Where-Object -Property "Name" -eq $productName
@@ -42,6 +35,37 @@ function HasOutlook2016 {
     return (GetOutlook2016Bitness -ne $null)
 }
 
+function Write-log () {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$false)][string]$Message,
+        [Parameter(Mandatory=$False)][ValidateSet('Log','ERROR','Data')][String]$Type = 'Log'
+      )
+    Set-Location C:\Temp
+    
+    $MyLogName = "$($MyInvocation.ScriptName)"
+    $LogName = (($MyLogName).Split('\')[$(($MyLogName).Split('\')).Count - 1]).Replace('.ps1','')
+    $scriptLog = "$LogName.log"
+    if (!(Test-Path 'C:\Temp')) {
+        New-Item -ItemType Directory -Name .\Temp
+    }
+    if (!(Test-Path $scriptLog)) {
+        New-Item -ItemType File -Name $scriptLog
+        $MyDate = Get-Date -Format s
+        Add-Content -Path "----------------------------------------------"
+        Add-Content -Path "$scriptLog" -Value "$MyDate - $Type - $MyLogName "
+        Add-Content -Path "$scriptLog" -Value "$MyDate - $Type - $Message"
+    }
+    $MyDate = Get-Date -Format s
+    $Lastrun = (Get-Content $scriptLog -Tail 1).Split(' ')
+    $lastruncomparor = ([datetime]$lastrun[0]).AddMinutes(30)
+    If ($MyDate -gt $lastruncomparor) {
+        Add-Content -Path "----------------------------------------------"
+        Add-Content -Path "$scriptLog" -Value "$MyDate - $Type - $MyLogName"
+    }
+    Add-Content -Path "$scriptLog" -Value "$MyDate - $Type - $Message"
+}
+
 $ErrorActionPreference = "Stop"
 
 $OAUM_x86_PC = "SkyKick Outlook Assistant User Application (x86)"
@@ -57,7 +81,7 @@ If ((Get-CimInstance -ClassName Win32_OperatingSystem).ProductType -ne 1) {
     return 'Outlook Assistant is not meant for Server environments.  Cannot Continue.'
 }
 
-Write-Log -message "Loading WMI Product Database ... " -Type 'Log'
+Write-Log -message "Loading WMI Product Database ... " -Type Log
 $installer_db = Get-CimInstance Win32_Product
 Write-Log -message  "Done" -Type 'Log'
 
