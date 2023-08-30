@@ -21,7 +21,8 @@
 
 [CmdletBinding()]
 Param(
-    [Parameter(Mandatory=$true)][String]$FileName
+    [Parameter(Mandatory=$true)][String]$FileName,
+    [Parameter(Mandatory=$false)][string]$arguments
 )
 
 $DownloadLocation = 'C:\Temp'
@@ -32,4 +33,4 @@ $FullUrl = "$BaseRepoUrl$FileName.ps1"
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Invoke-WebRequest -UseBasicParsing -Uri $FullUrl -OutFile "$DownloadLocation\$FileName.ps1"
 
-& "$DownloadLocation\$FileName.ps1"
+& "$DownloadLocation\$FileName.ps1 $arguments"
