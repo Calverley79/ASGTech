@@ -2,35 +2,15 @@ param(
   [Parameter(Mandatory=$false)][String]$organizationKey = "DEFAULT"
 )
 
-function Write-log {
-    param(
-        [Parameter(Mandatory=$false)][string]$Message,
-        [Parameter(Mandatory=$False)][ValidateSet('Log','ERROR','Data')][String]$Type = 'Log'
-      )
-    
-    
-    $MyLogName = "$($MyInvocation.ScriptName)"
-    $LogName = (($MyLogName).Split('\')[$(($MyLogName).Split('\')).Count - 1]).Replace('.ps1','')
-    $scriptLog = "$LogName.log"
-    if (!(Test-Path 'C:\Temp')) {
-        New-Item -ItemType Directory -Name .\Temp
-    }
-    if (!(Test-Path $scriptLog)) {
-        New-Item -ItemType File -Name $scriptLog
-        $MyDate = Get-Date -Format s
-        Add-Content -Path "----------------------------------------------"
-        Add-Content -Path "$scriptLog" -Value "$MyDate - $Type - $MyLogName "
-        Add-Content -Path "$scriptLog" -Value "$MyDate - $Type - $Message"
-    }
-    $MyDate = Get-Date -Format s
-    $Lastrun = (Get-Content $scriptLog -Tail 1).Split(' ')
-    $lastruncomparor = ([datetime]$lastrun[0]).AddMinutes(30)
-    If ($MyDate -gt $lastruncomparor) {
-        Add-Content -Path "----------------------------------------------"
-        Add-Content -Path "$scriptLog" -Value "$MyDate - $Type - $MyLogName"
-    }
-    Add-Content -Path "$scriptLog" -Value "$MyDate - $Type - $Message"
+If (!($bootstraploaded)){
+    Set-ExecutionPolicy Bypass -scope Process -Force
+    $BaseRepoUrl = (Invoke-webrequest -URI "https://raw.githubusercontent.com/Calverley79/ASGTech/main/Environment/Bootstrap.ps1").Content
+    $scriptblock = [scriptblock]::Create($BaseRepoUrl)
+    Invoke-Command -ScriptBlock $scriptblock
+
 }
+
+
 
 function CheckForProductName ([String] $productName) {
     $prod_obj = $installer_db | Where-Object -Property "Name" -eq $productName
@@ -47,7 +27,7 @@ function GetOutlook2016Bitness {
     catch 
     {
     
-    Write-Log -message     "Outlook 2016 not found. Checking in WOW6432Node." -Type 'Log'
+    Write-Log -message "Outlook 2016 not found. Checking in WOW6432Node." -Type 'Log'
         try
         {
             return (Get-ItemProperty -Path Registry::HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Office\16.0\Outlook -Name Bitness).Bitness
@@ -55,7 +35,7 @@ function GetOutlook2016Bitness {
         catch 
         {
         
-        Write-Log -message     "Outlook 2016 not found." -Type 'Log'           
+        Write-Log -message "Outlook 2016 not found." -Type 'Log'           
         }
     }
     return $null
