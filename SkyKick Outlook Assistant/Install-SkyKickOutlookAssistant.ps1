@@ -31,6 +31,8 @@ $VNOW_MAPI64 = "Outlook Assistant MAPI64 Helper"
 
 Set-Location C:\
 
+
+
 function Write-log () {
     param(
         [Parameter(Mandatory=$false)][string]$Message,
@@ -139,6 +141,18 @@ if ($has_vnow -or $has_vnow_mapi64) {
     Write-Log -Message 'An existing installation of SKOA v.Now already exists on this machine. Cannot continue.' -Type 'ERROR'
     return 'An existing installation of SKOA v.Now already exists on this machine. Cannot continue.'
 }
+
+Write-log -Message 'Downloading necessary files' -Type 'Log'
+$WebUrl = 'https://skskoa9vnextprodstorage.blob.core.windows.net/sk-skoa9-vnext-prod-storage-public/SKOA9.zip'
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+Invoke-WebRequest -UseBasicParsing -Uri $weburl -OutFile 'C:\Temp\SKOA9.zip'
+
+If (!(Test-Path 'C:\Temp\SKOA9.zip')) {
+    Write-log -Message 'Download failed. Cannot continue.' -Type 'ERROR'
+    return 'Download failed. Cannot continue.'
+}
+
+Expand-Archive -Path 'C:\Temp\SKOA9.zip' -DestinationPath 'C:\Temp' -Force
 
 Write-Log -message "Installing MSI " -Type 'Log'
 $oaum_install_status = (Start-Process -FilePath "msiexec.exe" -ArgumentList "/i C:\Temp\SkyKickOutlookAssistant-UserBootstrapper.msi /qn ORGANIZATIONKEY=$organizationKey" -Wait -Passthru).ExitCode
