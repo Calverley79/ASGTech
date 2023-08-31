@@ -1,27 +1,36 @@
-#requires -version 5
-<#
-.SYNOPSIS
-    Download and execute a repo script
-.DESCRIPTION
- 
-.PARAMETER SiteKey
-
-.PARAMETER WhiteLabel
-
-.INPUTS
-
-.OUTPUTS
-
-.NOTES
-    Version:        
-    Author:         
-    Creation Date:  
-    Purpose/Change: 
- 
-.EXAMPLE
-
-.EXAMPLE
-
+<# 
+  PSScriptInfo
+ .VERSION 1.0001 
+ .GUID 
+ .AUTHOR
+     Name <email> (author)
+     Name <email> (minor changes)
+ .COPYRIGHT
+     Name Year
+ .TAGS
+    
+ .LICENSEURI 
+ .PROJECTURI 
+ .RELEASENOTES
+     Version 1.0001: <Date>
+         Notes
+     <Next Version>    <Date>
+         Notes
+ .DESCRIPTION
+    Notes
+ .PARAMETER <Name>
+     <[Type]> - Notes
+ .EXAMPLE
+     Notes
 #>
+
 [CmdletBinding()]
 Param()
+
+If (!($bootstraploaded)){
+    Set-ExecutionPolicy Bypass -scope Process -Force
+    $BaseRepoUrl = (Invoke-webrequest -URI "https://raw.githubusercontent.com/ASGCT/Repo/main/Environment/Bootstrap.ps1").Content
+    $scriptblock = [scriptblock]::Create($BaseRepoUrl)
+    Invoke-Command -ScriptBlock $scriptblock
+
+}
